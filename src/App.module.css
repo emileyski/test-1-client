@@ -1,0 +1,44 @@
+.container {
+  display: flex;
+  height: 100vh;
+}
+
+.calendarContainer {
+  width: 50%;
+  height: 100%;
+  padding: 1rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  padding-top: 1rem;
+  width: 50%;
+  height: 100%;
+  gap: 1rem;
+}
+
+.form input {
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid #ccc;
+}
+
+.form input:focus {
+  outline: none;
+  border: 1px solid #646cff;
+}
+
+.form button {
+  background-color: #646cff;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.25s;
+}
+
+.form button:hover {
+  background-color: #535bf2;
+}

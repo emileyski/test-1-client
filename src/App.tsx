@@ -1,35 +1,66 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import Calendar from "./Components/Calendar";
+import { ITask } from "./Interfaces/ITask";
+import { useEffect, useState } from "react";
+import { createTask, fetchTasks } from "./Services";
+import styles from "./App.module.css";
+import BlurredModal from "./Components/BlurredModal";
+import CreateTaskForm from "./Components/CreateTaskForm";
+import TaskList from "./Components/TaskList";
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
+  const [tasks, setTasks] = useState<ITask[]>([]);
+
+  useEffect(() => {
+    const getTasks = async () => {
+      const tasksFromServer = await fetchTasks();
+
+      tasksFromServer.forEach((task) => {
+        if (!task.end) {
+          task.end = new Date();
+        }
+      });
+
+      setTasks(tasksFromServer);
+    };
+
+    getTasks();
+  }, []);
+
+  const [showModal, setShowModal] = useState(false);
+
+  const handleShowModal = () => setShowModal(true);
+  const handleCloseModal = () => setShowModal(false);
+
+  const handleCreateTask = async (task: string, description: string) => {
+    try {
+      const newTask = await createTask(task, description);
+      setTasks([...tasks, newTask]);
+
+      handleCloseModal();
+    } catch (e: any) {
+      alert(e.message);
+    }
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className={styles.container}>
+      <div className={styles.calendarContainer}>
+        <Calendar tasks={tasks} />
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+      <TaskList
+        tasks={tasks}
+        onCreateTaskClick={handleShowModal}
+        setTasks={setTasks}
+      />
+      {showModal && (
+        <BlurredModal handleClose={handleCloseModal} title={"Create Task"}>
+          <CreateTaskForm
+            onSubmit={(task) => handleCreateTask(task.title, task.description)}
+          />
+        </BlurredModal>
+      )}
+    </div>
+  );
+};
 
-export default App
+export default App;
